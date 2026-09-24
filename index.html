@@ -3,889 +3,304 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestionnaire des tâches 2.0</title>
+  <title>Gestionnaire des tâches</title>
   <style>
-    :root {
-      --bg1: #020912;
-      --bg2: #050d1d;
-      --bg3: #071326;
-      --panel: rgba(7, 16, 28, 0.9);
-      --panel-2: rgba(9, 20, 34, 0.9);
-      --line: rgba(90, 158, 255, 0.28);
-      --cyan: #32d6ff;
-      --blue: #1d8ec8;
-      --green: #36f0b2;
-      --purple: #d972ff;
-      --orange: #ff9d39;
-      --red: #ff2e52;
-      --red-2: #ff3f5e;
-      --shadow-red: rgba(255, 45, 92, 0.58);
-      --text: #edf7ff;
-      --muted: #9bb5d9;
-      --muted-2: #7da0c8;
-      --table: #071d35;
-      --table-alt: #0d2342;
-      --glass: rgba(9, 22, 36, 0.8);
+    :root{
+      --bg0:#020912;
+      --bg1:#040d1d;
+      --bg2:#081f38;
+      --panel:#07182a;
+      --panel2:#081e31;
+      --panel3:#071b2f;
+      --line:rgba(122,180,255,.18);
+      --line2:rgba(127,193,255,.12);
+      --cyan:#17d2ff;
+      --blue:#1a8dff;
+      --green:#2ef0a7;
+      --purple:#d267ff;
+      --orange:#ff9f2e;
+      --red:#ff2a53;
+      --red2:#ff4a6b;
+      --text:#edf6ff;
+      --muted:#9bb5d7;
+      --muted2:#7ca2d3;
+      --shadow: rgba(11, 27, 41, 0.9);
     }
 
-    * { box-sizing: border-box; }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:#02070d;color:var(--text);font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;overflow:hidden}
+    body{display:grid;place-items:center}
 
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: linear-gradient(180deg, #020915 0%, #01070d 100%);
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text);
+    .app{
+      width:min(1500px,96vw);
+      height:min(930px,94vh);
+      border:1px solid rgba(112,160,253,.45);
+      position:relative;
+      background:linear-gradient(180deg,#020b18 0%,#040d1a 100%);
+      overflow:hidden;
+      box-shadow:0 0 24px rgba(8,18,32,.9), inset 0 0 25px rgba(29,110,255,.06);
     }
 
-    body {
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-    }
-
-    .app {
-      width: min(1500px, 96vw);
-      height: min(930px, 94vh);
-      position: relative;
-      background: linear-gradient(180deg, rgba(6, 13, 22, 0.96), rgba(4, 11, 18, 0.96));
-      border: 1px solid rgba(81, 128, 196, 0.5);
-      box-shadow: 0 0 30px rgba(9, 18, 36, 0.95), inset 0 0 32px rgba(27, 124, 255, 0.08);
-      overflow: hidden;
-    }
-
-    .app::before {
-      content: "";
-      position: absolute;
-      inset: 0;
+    .app::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
       background:
-        radial-gradient(circle at 12% 15%, rgba(255, 54, 108, 0.16), transparent 16%),
-        radial-gradient(circle at 78% 30%, rgba(18, 125, 255, 0.1), transparent 18%),
-        linear-gradient(130deg, transparent 0%, rgba(255, 0, 78, 0.04) 30%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .app::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(120deg, transparent 0 35%, rgba(255, 0, 64, 0.12) 36%, transparent 38%),
-        linear-gradient(300deg, transparent 0 66%, rgba(255, 0, 81, 0.1) 67%, transparent 70%);
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    .topbar {
-      position: relative;
-      z-index: 2;
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px 0 18px;
-      border-bottom: 1px solid rgba(83, 129, 195, 0.4);
-      background: rgba(5, 12, 21, 0.35);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, rgba(255, 84, 120, 0.95), rgba(255, 37, 79, 0.82));
-      border: 1px solid rgba(255, 133, 170, 0.7);
-      box-shadow: 0 0 18px rgba(255, 70, 110, 0.24);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .brand-mark::before {
-      content: "";
-      position: absolute;
-      inset: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.14);
-      border: 2px solid rgba(255,255,255,0.22);
-      transform: skewY(-10deg);
-    }
-
-    .brand-text {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      color: #eef7ff;
-      text-shadow: 0 0 18px rgba(65, 179, 255, 0.18);
-    }
-
-    .brand-text .mini-tag {
-      display: block;
-      font-size: 10px;
-      opacity: 0.6;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-left: 2px;
-      margin-bottom: 2px;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--text);
-      font-size: 13px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(89, 144, 219, 0.22);
-      background: rgba(9, 17, 28, 0.52);
-      padding: 7px 10px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.02em;
-    }
-
-    .pill .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      background: var(--red);
-      box-shadow: 0 0 12px rgba(255, 75, 107, 0.8);
-    }
-
-    .top-actions .pill:first-child {
-      background: rgba(255, 49, 89, 0.08);
-      border-color: rgba(255, 78, 116, 0.22);
-      color: #ffd3dc;
-    }
-
-    .window-icons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-left: 8px;
-      padding: 0 4px;
-    }
-
-    .window-icons span {
-      width: 12px;
-      height: 12px;
-      display: inline-block;
-      border-radius: 2px;
-      background: linear-gradient(180deg, #ff5f6f, #ff2a4d);
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 0 10px rgba(255, 42, 86, 0.22);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .window-icons span:nth-child(1)::before,
-    .window-icons span:nth-child(2)::before,
-    .window-icons span:nth-child(3)::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.08);
-    }
-
-    .layout {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      height: calc(100% - 72px);
-    }
-
-    .sidebar {
-      border-right: 1px solid rgba(111, 163, 235, 0.18);
-      background: rgba(5, 11, 20, 0.62);
-      padding: 18px 12px 16px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .nav {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      height: 42px;
-      padding: 0 14px 0 12px;
-      border-radius: 9px;
-      color: #e5f3ff;
-      font-size: 15px;
-      border: 1px solid transparent;
-      background: transparent;
-      position: relative;
-    }
-
-    .nav-item .icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      border: 2px solid rgba(207, 229, 255, 0.94);
-      display: inline-block;
-      position: relative;
-      flex-shrink: 0;
-      opacity: 0.96;
-    }
-
-    .nav-item.active {
-      background: linear-gradient(90deg, rgba(255, 45, 92, 0.9), rgba(255, 48, 92, 0.52));
-      border-color: rgba(255, 111, 134, 0.35);
-      box-shadow: inset 0 0 0 1px rgba(255, 130, 162, 0.1), 0 0 16px rgba(255, 45, 92, 0.14);
-    }
-
-    .nav-item:nth-child(1) .icon { border-radius: 4px; }
-    .nav-item:nth-child(2) .icon { border-radius: 4px; }
-    .nav-item:nth-child(3) .icon { border-radius: 4px; }
-    .nav-item:nth-child(4) .icon { border-radius: 4px; }
-    .nav-item:nth-child(5) .icon { border-radius: 4px; }
-    .nav-item:nth-child(6) .icon { border-radius: 4px; }
-    .nav-item:nth-child(7) .icon { border-radius: 4px; }
-    .nav-item:nth-child(8) .icon { border-radius: 4px; }
-    .nav-item:nth-child(9) .icon { border-radius: 4px; }
-
-    .sidebar-footer {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(120, 165, 233, 0.18);
-    }
-
-    .aside-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 34px;
-      font-size: 14px;
-      color: #ebfaff;
-      padding: 0 8px 0 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(123, 168, 238, 0.12);
-      background: rgba(13, 22, 33, 0.18);
-    }
-
-    .aside-row .mini-badge {
-      width: 18px;
-      height: 18px;
-      border-radius: 6px;
-      background: linear-gradient(135deg, rgba(255, 100, 100, 0.18), rgba(255, 60, 110, 0.28));
-      border: 1px solid rgba(255, 115, 149, 0.32);
-      display: inline-block;
-      position: relative;
-    }
-
-    .aside-row .mini-badge::before {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.72);
-    }
-
-    .toggle {
-      width: 38px;
-      height: 20px;
-      border-radius: 999px;
-      background: rgba(255, 45, 92, 0.18);
-      border: 1px solid rgba(255, 104, 139, 0.48);
-      position: relative;
-      box-shadow: 0 0 12px rgba(255, 52, 96, 0.18);
-    }
-
-    .toggle::before {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      right: 4px;
-      top: 3px;
-      border-radius: 50%;
-      background: linear-gradient(180deg, #ffd0d8, #ff5a7b);
-      box-shadow: 0 0 12px rgba(255, 91, 123, 0.8);
-    }
-
-    .main {
-      padding: 20px 18px 14px 18px;
-      min-width: 0;
-    }
-
-    .panel-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 18px 4px;
-      letter-spacing: 0.2px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(220px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-      min-width: 0;
-    }
-
-    .stat-card {
-      position: relative;
-      min-height: 238px;
-      background: linear-gradient(180deg, rgba(10, 20, 33, 0.84), rgba(7, 14, 24, 0.9));
-      border: 1px solid rgba(89, 141, 214, 0.22);
-      border-radius: 14px;
-      padding: 12px 14px 12px;
-      overflow: hidden;
-      box-shadow: inset 0 0 20px rgba(38, 108, 255, 0.05);
-    }
-
-    .stat-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, rgba(52, 115, 255, 0.025), transparent 50%, rgba(38, 131, 255, 0.015));
-      pointer-events: none;
-    }
-
-    .card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-
-    .card-ico {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.22);
-      display: inline-block;
-      background: linear-gradient(135deg, rgba(67, 187, 255, 0.28), rgba(67, 187, 255, 0.44));
-      position: relative;
-      box-shadow: 0 0 12px rgba(74, 194, 255, 0.24);
-    }
-
-    .card-ico::before {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-    }
-
-    .card-ico.green { background: linear-gradient(135deg, rgba(52,255,170,0.25), rgba(52,255,170,0.44)); }
-    .card-ico.purple { background: linear-gradient(135deg, rgba(206,109,255,0.22), rgba(206,109,255,0.42)); }
-    .card-ico.orange { background: linear-gradient(135deg, rgba(255,158,76,0.16), rgba(255,158,76,0.42)); }
-
-    .card-tag {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 14px;
-      text-align: right;
-      max-width: 58%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .stat-area {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      margin-top: 2px;
-      gap: 12px;
-    }
-
-    .ring-shell {
-      position: relative;
-      display: grid;
-      place-items: center;
-      width: 124px;
-      height: 124px;
-      margin: 4px auto 0 auto;
-    }
-
-    .ring {
-      position: relative;
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: conic-gradient(var(--a) calc(var(--p) * 1%), rgba(23, 43, 61, 0.98) 0);
-      box-shadow: inset 0 0 0 1px rgba(131, 206, 255, 0.18), 0 0 20px rgba(48, 183, 255, 0.08);
-    }
-
-    .ring::before {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 50%;
-      background: rgba(9, 18, 32, 0.96);
-      border: 1px solid rgba(107, 170, 255, 0.18);
-      box-shadow: inset 0 0 20px rgba(26, 74, 118, 0.25);
-    }
-
-    .ring-value {
-      position: relative;
-      z-index: 1;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: var(--text);
-    }
-
-    .ring-value small {
-      display: block;
-      font-size: 9px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 2px;
-      text-align: center;
-    }
-
-    .metrics {
-      display: grid;
-      gap: 9px;
-      align-content: center;
-      font-size: 12px;
-    }
-
-    .metric-label {
-      display: block;
-      font-size: 11px;
-      color: var(--muted-2);
-      margin-bottom: 4px;
-      letter-spacing: 0.04em;
-      text-transform: none;
-    }
-
-    .metric-value {
-      display: block;
-      font-size: 13px;
-      color: #eaf6ff;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .linechart {
-      position: relative;
-      z-index: 1;
-      height: 48px;
-      margin-top: 8px;
-      border-top: 1px solid rgba(128, 187, 255, 0.08);
-      background: linear-gradient(180deg, rgba(22, 39, 54, 0.2), rgba(11, 16, 26, 0));
-      overflow: hidden;
-      border-radius: 0 0 10px 10px;
-    }
-
-    .linechart svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1.8fr 0.8fr;
-      gap: 14px;
-      min-height: 0;
-      height: calc(100% - 290px);
-      min-height: 320px;
-    }
-
-    .panel {
-      position: relative;
-      background: linear-gradient(180deg, rgba(8, 18, 30, 0.9), rgba(6, 12, 22, 0.96));
-      border: 1px solid rgba(92, 147, 223, 0.22);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: inset 0 0 26px rgba(58, 115, 255, 0.04);
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      height: 54px;
-      padding: 8px 12px 10px;
-      border-bottom: 1px solid rgba(110, 163, 235, 0.12);
-    }
-
-    .search-wrap {
-      position: relative;
-      flex: 1;
-      min-width: 0;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid rgba(113, 164, 241, 0.2);
-      background: rgba(12, 24, 38, 0.8);
-      overflow: hidden;
-    }
-
-    .search-wrap::before {
-      content: "⌕";
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #9bb7db;
-      font-size: 18px;
-      line-height: 1;
-    }
-
-    .search-wrap input {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: transparent;
-      outline: none;
-      color: var(--text);
-      padding: 0 12px 0 36px;
-      font-size: 14px;
-    }
-
-    .toolbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 4px;
-    }
-
-    .toolbar-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 1px solid rgba(117, 171, 244, 0.18);
-      background: rgba(18, 29, 44, 0.6);
-      display: grid;
-      place-items: center;
-      color: #dfeeff;
-      font-size: 14px;
-    }
-
-    .table-wrap {
-      height: calc(100% - 54px);
-      overflow: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 12px;
-    }
-
-    thead th {
-      color: #a7c0e3;
-      font-weight: 600;
-      text-align: left;
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(103, 151, 227, 0.12);
-      background: rgba(9, 20, 34, 0.38);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    tbody td {
-      padding: 8px 12px;
-      border-bottom: 1px solid rgba(92, 148, 229, 0.08);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: #e8f3ff;
-    }
-
-    tbody tr:hover {
-      background: rgba(31, 56, 89, 0.12);
-    }
-
-    .process-name {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .process-icon {
-      width: 14px;
-      height: 14px;
-      border-radius: 4px;
-      background: linear-gradient(135deg, rgba(51, 166, 255, 0.35), rgba(27, 65, 123, 0.85));
-      border: 1px solid rgba(95, 190, 255, 0.38);
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .process-icon::before {
-      content: "";
-      position: absolute;
-      inset: 3px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.18);
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      height: 22px;
-      padding: 0 8px;
-      border-radius: 5px;
-      border: 1px solid rgba(111, 170, 255, 0.12);
-      background: rgba(14, 31, 45, 0.55);
-      color: #dfeeff;
-      font-size: 11px;
-    }
-
-    .phone-panel {
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .phone-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 12px 12px 10px;
-      border-bottom: 1px solid rgba(110, 163, 235, 0.12);
-      font-weight: 700;
-      font-size: 15px;
-    }
-
-    .offline-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(255, 69, 101, 0.08);
-      border: 1px solid rgba(255, 82, 122, 0.18);
-      color: #ff8ea1;
-    }
-
-    .offline-pill .small-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--red);
-      box-shadow: 0 0 10px rgba(255, 71, 103, 0.7);
-      display: inline-block;
-    }
-
-    .phone-body {
-      padding: 14px 12px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      height: calc(100% - 54px);
-      min-height: 0;
-    }
-
-    .device-empty {
-      min-height: 140px;
-      background: rgba(9, 19, 31, 0.7);
-      border: 1px solid rgba(96, 150, 229, 0.18);
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 14px 10px;
-      color: #dfeeff;
-    }
-
-    .device-phone {
-      width: 70px;
-      height: 76px;
-      border-radius: 18px;
-      border: 2px solid rgba(94, 153, 255, 0.58);
-      background: linear-gradient(180deg, rgba(17, 47, 82, 0.3), rgba(12, 22, 36, 0.6));
-      position: relative;
-      box-shadow: inset 0 0 18px rgba(71, 165, 255, 0.08), 0 0 18px rgba(76, 164, 255, 0.08);
-      margin-bottom: 12px;
-    }
-
-    .device-phone::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.8);
-      background: rgba(255,255,255,0.04);
-    }
-
-    .device-empty p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .device-empty b {
-      margin-bottom: 8px;
-      font-size: 13px;
-      color: #edf7ff;
-    }
-
-    .phone-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .action-btn {
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid rgba(106, 170, 255, 0.2);
-      background: linear-gradient(90deg, rgba(22, 67, 147, 0.66), rgba(12, 30, 56, 0.7));
-      color: #edf8ff;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: 0.03em;
-      cursor: pointer;
-    }
-
-    .action-btn.primary {
-      background: linear-gradient(90deg, rgba(35, 108, 255, 0.2), rgba(47, 181, 255, 0.16));
-      border-color: rgba(104, 178, 255, 0.26);
-    }
-
-    .mini-analytics {
-      background: rgba(9, 19, 31, 0.72);
-      border: 1px solid rgba(99, 147, 223, 0.18);
-      border-radius: 10px;
-      padding: 10px 8px 8px;
-    }
-
-    .mini-analytics h4 {
-      margin: 0 0 10px;
-      font-size: 14px;
-      color: #edf7ff;
-    }
-
-    .mini-stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-    }
-
-    .mini-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 4px 6px;
-      text-align: center;
-      color: #dfeeff;
-      font-size: 11px;
-    }
-
-    .mini-ring {
-      position: relative;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: conic-gradient(var(--m) 0%, rgba(255,255,255,0.1) 0);
-      display: grid;
-      place-items: center;
-    }
-
-    .mini-ring::before {
-      content: "";
-      position: absolute;
-      inset: 7px;
-      border-radius: 50%;
-      background: rgba(7, 17, 29, 0.95);
-      border: 1px solid rgba(104, 166, 255, 0.14);
-    }
-
-    .mini-ring span {
-      position: relative;
-      z-index: 1;
-      font-size: 9px;
-      font-weight: 700;
-    }
-
-    .device-info {
-      background: rgba(9, 19, 31, 0.72);
-      border: 1px solid rgba(99, 147, 223, 0.18);
-      border-radius: 10px;
-      padding: 8px 10px 10px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 10px;
-      font-size: 12px;
-    }
-
-    .device-info label {
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .device-info span {
-      color: #edf7ff;
-      text-align: right;
-      font-weight: 600;
-    }
-
-    @media (max-width: 1240px) {
-      .cards { grid-template-columns: repeat(2, minmax(200px, 1fr)); }
-      .content-grid { grid-template-columns: 1fr; }
-      .layout { grid-template-columns: 200px 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      body { overflow: auto; }
-      .app { width: 100vw; height: auto; min-height: 100vh; }
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 1px solid rgba(111,163,235,0.18); }
-      .cards { grid-template-columns: 1fr; }
-      .top-actions .pill { display: none; }
-      .brand-text { font-size: 18px; }
+        linear-gradient(130deg, transparent 0 36%, rgba(255,41,93,.1) 37%, transparent 40%),
+        linear-gradient(310deg, transparent 0 63%, rgba(255,41,93,.08) 64%, transparent 67%),
+        radial-gradient(circle at 15% 18%, rgba(255,54,104,.15), transparent 16%),
+        radial-gradient(circle at 72% 35%, rgba(24,120,255,.14), transparent 18%);
+    }
+
+    .topbar{
+      height:72px;
+      border-bottom:1px solid rgba(100,155,240,.28);
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px 0 18px;
+      background:rgba(8,15,25,.15);
+    }
+
+    .topbar::before{
+      content:"";
+      position:absolute;
+      left:0; bottom:-1px;
+      width:220px; height:2px;
+      background:linear-gradient(90deg, #f92558, #ff4e74);
+      box-shadow:0 0 18px rgba(255,58,100,.5);
+    }
+
+    .topbar::after{
+      content:"";
+      position:absolute;
+      right:0; bottom:-1px;
+      width:280px; height:2px;
+      background:linear-gradient(90deg, rgba(255,50,92,.9), rgba(255,50,92,0));
+      box-shadow:0 0 18px rgba(255,58,100,.35);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      letter-spacing:.3px;
+      color:var(--text);
+      font-size:20px;
+      margin-left:6px;
+    }
+
+    .brand-mark{
+      width:32px;height:32px;border-radius:10px;
+      background:linear-gradient(135deg,#ff7c7c,#ff2d56 50%,#ff5d78);
+      border:1px solid rgba(255,160,180,.5);
+      box-shadow:0 0 14px rgba(255,79,115,.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .brand-mark::before{
+      content:"";position:absolute;inset:6px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);
+      transform:skewY(-10deg);
+    }
+
+    .brand-text{display:flex;align-items:flex-start;gap:6px;flex-direction:column;line-height:1}
+    .brand-text .small{font-size:10px; letter-spacing:.12em; text-transform:uppercase; opacity:.6; margin-left:4px}
+
+    .top-actions{display:flex;align-items:center;gap:10px;position:relative;z-index:2}
+
+    .pill{
+      height:32px;
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(17,28,41,.72);
+      border:1px solid rgba(111,165,237,.24);
+      border-radius:8px;
+      padding:0 11px 0 10px;
+      font-size:12px;
+      color:#edf7ff;
+    }
+
+    .pill.red{background:rgba(255,47,92,.08); border-color:rgba(255,85,120,.2)}
+    .pill .status-dot{
+      width:8px;height:8px;border-radius:50%;background:#ff4c72;display:inline-block;
+      box-shadow:0 0 10px rgba(255,76,114,.7);
+    }
+
+    .controls{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      width:110px;height:32px;border-radius:8px;background:rgba(16,25,38,.6);border:1px solid rgba(105,163,245,.22)
+    }
+    .controls .min,.controls .max,.controls .close{width:12px;height:12px;border-radius:2px;display:inline-block;background:linear-gradient(180deg,#ff7a87,#ff3d5e);border:1px solid rgba(255,255,255,.05)}
+    .controls .min{background:linear-gradient(180deg,#ff7a87,#ff3d5e)}
+    .controls .max{background:linear-gradient(180deg,#ff7a87,#ff3d5e)}
+    .controls .close{background:linear-gradient(180deg,#ff7a87,#ff3d5e)}
+
+    .layout{display:grid;grid-template-columns:220px 1fr;height:calc(100% - 72px);position:relative;z-index:2}
+
+    .sidebar{
+      background:rgba(5,12,21,.55);
+      border-right:1px solid rgba(100,155,240,.2);
+      padding:10px 12px 14px 12px;
+      display:flex;flex-direction:column;
+    }
+
+    .nav{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+    .nav-item{
+      height:42px;border-radius:8px;display:flex;align-items:center;gap:12px;
+      padding:0 12px 0 12px;color:#e1f3ff;font-size:15px;border:1px solid transparent;background:transparent;
+    }
+    .nav-item .icon{
+      width:17px;height:17px;border:2px solid rgba(223,234,255,.95);border-radius:5px;display:inline-block;position:relative;flex-shrink:0
+    }
+    .nav-item.active{
+      background:linear-gradient(90deg, rgba(255,43,87,.92), rgba(255,52,90,.6));
+      border-color:rgba(255,128,147,.32);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    .nav-item:nth-child(1) .icon{border-radius:4px}
+    .nav-item:nth-child(2) .icon{border-radius:4px}
+    .nav-item:nth-child(3) .icon{border-radius:4px}
+    .nav-item:nth-child(4) .icon{border-radius:4px}
+    .nav-item:nth-child(5) .icon{border-radius:4px}
+    .nav-item:nth-child(6) .icon{border-radius:4px}
+    .nav-item:nth-child(7) .icon{border-radius:4px}
+    .nav-item:nth-child(8) .icon{border-radius:4px}
+    .nav-item:nth-child(9) .icon{border-radius:4px}
+
+    .sidebar-spacer{flex:1}
+
+    .sidebar-footer{display:flex;flex-direction:column;gap:10px;padding-top:12px;border-top:1px solid rgba(104,154,225,.18)}
+    .footer-row{
+      height:34px;border-radius:8px;border:1px solid rgba(116,168,255,.14);background:rgba(12,20,31,.22);
+      display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;color:#ebf8ff;font-size:13px
+    }
+    .mini-gear{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg, rgba(255,64,94,.35), rgba(255,55,100,.23));border:1px solid rgba(255,120,153,.28);position:relative}
+    .mini-gear::before{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid rgba(255,255,255,.74)}
+
+    .toggle{
+      width:38px;height:20px;border-radius:999px;background:rgba(255,44,86,.1);border:1px solid rgba(255,126,151,.4);position:relative;box-shadow:0 0 14px rgba(255,76,116,.14)
+    }
+    .toggle::before{content:"";position:absolute;right:4px;top:3px;width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,#ffd6dd,#ff617a);box-shadow:0 0 10px rgba(255,97,122,.7)}
+
+    .main{padding:18px 18px 14px 18px;min-width:0}
+    .titlebar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .section-title{font-size:22px;font-weight:700;letter-spacing:.2px;margin-left:8px}
+    .rpm{font-size:12px;color:var(--muted);margin-right:8px;display:flex;align-items:center;gap:8px}
+    .rpm .bold{color:#f8fbff;font-weight:700}
+
+    .cards{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .stat-card{
+      height:226px;border:1px solid rgba(92,149,219,.18);background:linear-gradient(180deg, rgba(10,17,28,.86), rgba(7,14,24,.9));
+      border-radius:12px;padding:12px 14px 10px;position:relative;overflow:hidden;
+      box-shadow:inset 0 0 22px rgba(26,122,255,.03);
+    }
+    .stat-card::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg, rgba(42, 115, 255, 0.015), transparent 55%, rgba(42, 115, 255, 0.01));pointer-events:none}
+
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1;margin-bottom:8px}
+    .card-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:600;font-size:14px}
+    .label-ico{width:18px;height:18px;border-radius:50%;display:inline-block;position:relative;border:1px solid rgba(255,255,255,.22);background:linear-gradient(135deg, rgba(38,211,255,.28), rgba(38,211,255,.44));box-shadow:0 0 12px rgba(69,189,255,.2)}
+    .label-ico::before{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid rgba(255,255,255,.8)}
+    .label-ico.green{background:linear-gradient(135deg, rgba(63,255,176,.22), rgba(44,229,179,.46))}
+    .label-ico.purple{background:linear-gradient(135deg, rgba(207,96,255,.22), rgba(207,96,255,.46))}
+    .label-ico.orange{background:linear-gradient(135deg, rgba(255,181,85,.22), rgba(255,181,85,.46))}
+
+    .card-tag{font-size:12px;color:var(--muted);text-align:right;max-width:54%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .card-body{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;position:relative;z-index:1;padding-top:4px}
+    .ring-shell{display:grid;place-items:center;height:110px}
+    .ring{
+      position:relative;width:92px;height:92px;border-radius:50%;
+      background:conic-gradient(var(--ring-color) calc(var(--pct) * 1%), rgba(19,34,49,.98) 0);
+      display:grid;place-items:center;box-shadow:0 0 18px rgba(39,184,255,.09), inset 0 0 0 1px rgba(120,192,255,.22);
+    }
+    .ring::before{content:"";position:absolute;inset:11px;border-radius:50%;background:rgba(7,18,29,.96);border:1px solid rgba(110,172,255,.17)}
+    .ring-value{position:relative;z-index:1;font-weight:700;font-size:14px;letter-spacing:0.04em}
+    .ring-value small{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;text-align:center}
+
+    .metrics{display:grid;gap:8px;align-content:center;padding-right:4px}
+    .metric{display:flex;flex-direction:column;gap:2px}
+    .metric .metric-value{font-size:13px;font-weight:700;color:#f0f9ff;line-height:1.2}
+    .metric .metric-label{font-size:11px;color:var(--muted2);line-height:1.2}
+
+    .linechart{position:relative;z-index:1;height:46px;margin-top:8px;border-radius:0 0 8px 8px;overflow:hidden;background:linear-gradient(180deg, rgba(19,31,46,.18), rgba(6,13,20,0));}
+    .linechart svg{display:block;width:100%;height:100%}
+
+    .bottom{display:grid;grid-template-columns:1.7fr .82fr;gap:14px;margin-top:18px;min-height:0;height:calc(100% - 270px)}
+    .panel{border:1px solid rgba(90,140,220,.22);border-radius:12px;background:linear-gradient(180deg, rgba(8,17,27,.88), rgba(7,13,22,.95));overflow:hidden;position:relative;box-shadow:inset 0 0 24px rgba(29,111,255,.04)}
+
+    .panel-header{height:54px;border-bottom:1px solid rgba(112,164,245,.12);display:flex;align-items:center;gap:10px;padding:9px 12px}
+    .search-wrap{flex:1;height:36px;position:relative;border-radius:8px;border:1px solid rgba(112,164,245,.18);background:rgba(12,24,38,.72)}
+    .search-wrap::before{content:"⌕";position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9bb7db;font-size:18px}
+    .search-wrap input{width:100%;height:100%;border:none;background:transparent;color:#edf6ff;outline:none;padding:0 12px 0 34px;font-size:14px}
+    .toolbar{display:flex;align-items:center;gap:8px}
+    .toolbar-btn{width:29px;height:29px;border-radius:8px;border:1px solid rgba(111,168,245,.16);background:rgba(15,27,39,.7);display:grid;place-items:center;color:#dfeeff;font-size:14px}
+
+    .table-wrap{height:calc(100% - 54px);overflow:auto}
+    table{width:100%;border-collapse:collapse;table-layout:fixed}
+    thead th{font-size:12px;color:#a4c0ea;font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid rgba(110,165,255,.12);background:rgba(10,18,29,.38);position:sticky;top:0;z-index:1}
+    tbody td{padding:9px 12px;border-bottom:1px solid rgba(103,150,227,.08);white-space:nowrap;color:#eaf5ff;overflow:hidden;text-overflow:ellipsis}
+    tbody tr:hover{background:rgba(24,41,61,.15)}
+
+    .process-name{display:flex;align-items:center;gap:10px;min-width:0;overflow:hidden}
+    .process-icon{width:15px;height:15px;border-radius:4px;display:inline-block;flex-shrink:0;position:relative;background:linear-gradient(135deg, rgba(49,155,255,.3), rgba(27,71,120,.82));border:1px solid rgba(104,179,255,.32)}
+    .process-icon::before{content:"";position:absolute;inset:3px;border-radius:2px;background:rgba(255,255,255,.14)}
+
+    .status-pill{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:5px;border:1px solid rgba(104,169,255,.12);background:rgba(11,22,33,.54);font-size:11px;color:#dfeeff}
+
+    .phone-wrap{display:flex;flex-direction:column;min-height:0}
+    .phone-head{height:54px;border-bottom:1px solid rgba(112,164,245,.12);display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#edf7ff;font-weight:700;font-size:15px}
+    .offline{display:flex;align-items:center;gap:6px;border-radius:999px;background:rgba(255,57,93,.08);border:1px solid rgba(255,86,120,.18);color:#ff9dad;padding:5px 9px;font-size:11px}
+    .offline .dot{width:8px;height:8px;border-radius:50%;background:#ff4d70;box-shadow:0 0 10px rgba(255,90,120,.75)}
+
+    .phone-body{padding:14px 12px 12px;display:flex;flex-direction:column;gap:12px;height:calc(100% - 54px)}
+    .device-empty{
+      min-height:140px;background:rgba(9,18,31,.68);border:1px solid rgba(93,142,215,.18);border-radius:10px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px 10px;color:#dfeeff
+    }
+    .phone-figure{width:74px;height:84px;border-radius:18px;border:2px solid rgba(96,155,255,.5);background:linear-gradient(180deg, rgba(15,39,64,.25), rgba(9,20,31,.58));box-shadow:inset 0 0 20px rgba(87,165,255,.06);position:relative;margin-bottom:12px}
+    .phone-figure::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;border:3px solid rgba(255,255,255,.8)}
+    .device-empty b{font-size:13px;margin-bottom:10px}
+    .device-empty p{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
+
+    .phone-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .action-btn{height:36px;border:1px solid rgba(103,166,238,.22);border-radius:8px;background:linear-gradient(90deg, rgba(17,70,147,.7), rgba(12,31,52,.72));color:#edf8ff;font-weight:600;font-size:11px;cursor:pointer}
+    .action-btn.primary{background:linear-gradient(90deg, rgba(31,109,255,.25), rgba(42,188,255,.14));border-color:rgba(110,189,255,.26)}
+
+    .phone-stats{background:rgba(9,18,31,.68);border:1px solid rgba(93,142,215,.18);border-radius:10px;padding:10px 10px 8px}
+    .phone-stats h4{margin:0 0 10px;font-size:13px;letter-spacing:0.04em}
+    .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .mini-stat{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;color:#dfeeff;font-size:11px}
+    .mini-ring{position:relative;width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--ring) 0%, rgba(255,255,255,0.12) 0);display:grid;place-items:center}
+    .mini-ring::before{content:"";position:absolute;inset:7px;border-radius:50%;background:rgba(7,17,29,.96);border:1px solid rgba(96,152,235,.14)}
+    .mini-ring span{position:relative;z-index:1;font-size:9px;font-weight:700}
+
+    .device-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;background:rgba(9,18,31,.68);border:1px solid rgba(93,142,215,.18);border-radius:10px;padding:8px 10px 10px;font-size:12px}
+    .device-meta label{color:var(--muted);font-weight:600;display:block}
+    .device-meta span{color:#e8f7ff;font-weight:600;text-align:right;display:block}
+
+    @media (max-width:1200px){
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .bottom{grid-template-columns:1fr;}
+      .layout{grid-template-columns:190px 1fr;}
+    }
+    @media (max-width:760px){
+      body{overflow:auto}
+      .app{width:100vw;height:auto;min-height:100vh}
+      .layout{grid-template-columns:1fr}
+      .sidebar{border-right:none;border-bottom:1px solid rgba(100,155,240,.2)}
+      .cards{grid-template-columns:1fr}
+      .brand{font-size:17px}
+      .top-actions .pill{display:none}
+      .main{padding:12px}
     }
   </style>
 </head>
@@ -894,16 +309,18 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark"></div>
-        <div class="brand-text"><span class="mini-tag">Acer</span>Gestionnaire des tâches</div>
+        <div class="brand-text">
+          <span class="small">Acer</span>
+          <span>Gestionnaire des tâches</span>
+        </div>
       </div>
-
       <div class="top-actions">
-        <div class="pill"><span class="dot"></span> Profil</div>
+        <div class="pill red"><span class="status-dot"></span> Profil</div>
         <div class="pill">🎮 Gaming</div>
-        <div class="window-icons">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div class="controls">
+          <span class="min"></span>
+          <span class="max"></span>
+          <span class="close"></span>
         </div>
       </div>
     </header>
@@ -922,118 +339,115 @@
           <div class="nav-item"><span class="icon"></span> Paramètres</div>
         </nav>
 
+        <div class="sidebar-spacer"></div>
+
         <div class="sidebar-footer">
-          <div class="aside-row">
+          <div class="footer-row">
             <span style="display:flex;align-items:center;gap:10px;">⚙ Mode jeu</span>
             <span class="toggle"></span>
           </div>
-          <div class="aside-row">
+          <div class="footer-row">
             <span style="display:flex;align-items:center;gap:10px;">⚙ Personnaliser</span>
-            <span style="font-size: 18px; opacity: 0.9;">›</span>
+            <span style="font-size:18px; opacity:.9;">›</span>
           </div>
         </div>
       </aside>
 
       <main class="main">
-        <h1 class="panel-title">Performance</h1>
+        <div class="titlebar">
+          <div class="section-title">Performance</div>
+          <div class="rpm"><span>Vitesse ventilateurs (GPU)</span> <span class="bold">900 RPM</span></div>
+        </div>
 
         <section class="cards">
-          <article class="stat-card" style="--a:#2ed5ff; --p:12;">
+          <article class="stat-card" style="--ring-color:#2ad7ff; --pct:12;">
             <div class="card-head">
-              <div class="card-label"><span class="card-ico"></span> CPU</div>
+              <div class="card-label"><span class="label-ico"></span> CPU</div>
               <div class="card-tag">AMD Ryzen 7 7800X3D</div>
             </div>
-            <div class="stat-area">
-              <div class="ring-shell">
-                <div class="ring"><div class="ring-value">12%<small>Utilisation</small></div></div>
-              </div>
+            <div class="card-body">
+              <div class="ring-shell"><div class="ring"><div class="ring-value">12%<small>Utilisation</small></div></div></div>
               <div class="metrics">
-                <div><span class="metric-value">4.52 GHz</span><span class="metric-label">Fréquence</span></div>
-                <div><span class="metric-value">52°C</span><span class="metric-label">Température</span></div>
-                <div><span class="metric-value">1.08 V</span><span class="metric-label">Tension</span></div>
+                <div class="metric"><span class="metric-value">4.52 GHz</span><span class="metric-label">Fréquence</span></div>
+                <div class="metric"><span class="metric-value">52°C</span><span class="metric-label">Température</span></div>
+                <div class="metric"><span class="metric-value">1.08 V</span><span class="metric-label">Tension</span></div>
               </div>
             </div>
             <div class="linechart">
-              <svg viewBox="0 0 300 48" preserveAspectRatio="none">
-                <path d="M0,28 L25,18 L52,20 L76,16 L102,26 L128,22 L153,29 L176,21 L198,17 L223,28 L247,21 L272,16 L300,24" fill="none" stroke="#2ed5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg viewBox="0 0 300 46" preserveAspectRatio="none">
+                <path d="M0,29 L20,20 L40,16 L60,25 L80,18 L100,24 L120,19 L140,21 L160,16 L180,19 L200,18 L220,25 L240,17 L260,16 L280,22 L300,19" fill="none" stroke="#2ad7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </article>
 
-          <article class="stat-card" style="--a:#52ffac; --p:38;">
+          <article class="stat-card" style="--ring-color:#39f3ac; --pct:38;">
             <div class="card-head">
-              <div class="card-label"><span class="card-ico green"></span> GPU</div>
+              <div class="card-label"><span class="label-ico green"></span> GPU</div>
               <div class="card-tag">NVIDIA GeForce RTX 4070</div>
             </div>
-            <div class="stat-area">
-              <div class="ring-shell">
-                <div class="ring"><div class="ring-value">38%<small>Utilisation</small></div></div>
-              </div>
+            <div class="card-body">
+              <div class="ring-shell"><div class="ring"><div class="ring-value">38%<small>Utilisation</small></div></div></div>
               <div class="metrics">
-                <div><span class="metric-value">210 MHz</span><span class="metric-label">Fréquence</span></div>
-                <div><span class="metric-value">48°C</span><span class="metric-label">Température</span></div>
-                <div><span class="metric-value">0.725 V</span><span class="metric-label">Tension</span></div>
+                <div class="metric"><span class="metric-value">210 MHz</span><span class="metric-label">Fréquence</span></div>
+                <div class="metric"><span class="metric-value">48°C</span><span class="metric-label">Température</span></div>
+                <div class="metric"><span class="metric-value">0.725 V</span><span class="metric-label">Tension</span></div>
               </div>
             </div>
             <div class="linechart">
-              <svg viewBox="0 0 300 48" preserveAspectRatio="none">
-                <path d="M0,22 L25,18 L50,26 L78,12 L103,18 L128,15 L153,13 L177,17 L202,11 L228,17 L252,13 L278,16 L300,10" fill="none" stroke="#52ffac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg viewBox="0 0 300 46" preserveAspectRatio="none">
+                <path d="M0,30 L22,25 L44,29 L66,18 L88,10 L110,16 L132,12 L154,15 L176,13 L198,14 L220,19 L242,13 L264,16 L286,19 L300,11" fill="none" stroke="#39f3ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </article>
 
-          <article class="stat-card" style="--a:#d77cff; --p:45;">
+          <article class="stat-card" style="--ring-color:#d56dff; --pct:45;">
             <div class="card-head">
-              <div class="card-label"><span class="card-ico purple"></span> Mémoire</div>
+              <div class="card-label"><span class="label-ico purple"></span> Mémoire</div>
               <div class="card-tag">SSD NVMe</div>
             </div>
-            <div class="stat-area">
-              <div class="ring-shell">
-                <div class="ring"><div class="ring-value">45%<small>Utilisation</small></div></div>
-              </div>
+            <div class="card-body">
+              <div class="ring-shell"><div class="ring"><div class="ring-value">45%<small>Utilisation</small></div></div></div>
               <div class="metrics">
-                <div><span class="metric-value">16.0 GB</span><span class="metric-label">Utilisation</span></div>
-                <div><span class="metric-value">7.2 / 16.0 GB</span><span class="metric-label">Mémoire</span></div>
-                <div><span class="metric-value">0.1 MB/s</span><span class="metric-label">Écriture</span></div>
+                <div class="metric"><span class="metric-value">16.0 GB</span><span class="metric-label">Utilisation</span></div>
+                <div class="metric"><span class="metric-value">7.2 / 16.0 GB</span><span class="metric-label">Mémoire</span></div>
+                <div class="metric"><span class="metric-value">0.1 MB/s</span><span class="metric-label">Écriture</span></div>
               </div>
             </div>
             <div class="linechart">
-              <svg viewBox="0 0 300 48" preserveAspectRatio="none">
-                <path d="M0,23 L26,16 L52,26 L77,19 L104,24 L128,12 L154,17 L179,13 L205,21 L228,19 L252,12 L276,18 L300,14" fill="none" stroke="#d77cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg viewBox="0 0 300 46" preserveAspectRatio="none">
+                <path d="M0,26 L24,18 L46,27 L68,21 L92,17 L114,24 L136,13 L158,16 L180,14 L202,18 L224,16 L246,18 L268,14 L290,19 L300,12" fill="none" stroke="#d56dff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </article>
 
-          <article class="stat-card" style="--a:#ffb14d; --p:3;">
+          <article class="stat-card" style="--ring-color:#ffb556; --pct:3;">
             <div class="card-head">
-              <div class="card-label"><span class="card-ico orange"></span> Réseau</div>
+              <div class="card-label"><span class="label-ico orange"></span> Réseau</div>
               <div class="card-tag">Wi‑Fi</div>
             </div>
-            <div class="stat-area">
-              <div class="ring-shell">
-                <div class="ring"><div class="ring-value">3%<small>Utilisation</small></div></div>
-              </div>
+            <div class="card-body">
+              <div class="ring-shell"><div class="ring"><div class="ring-value">3%<small>Utilisation</small></div></div></div>
               <div class="metrics">
-                <div><span class="metric-value">R: 12.4 Mbps</span><span class="metric-label">Réception</span></div>
-                <div><span class="metric-value">E: 3.2 Mbps</span><span class="metric-label">Emission</span></div>
-                <div><span class="metric-value">0.3 MB/s</span><span class="metric-label">Utilisation</span></div>
+                <div class="metric"><span class="metric-value">R: 12.4 Mbps</span><span class="metric-label">Réception</span></div>
+                <div class="metric"><span class="metric-value">E: 3.2 Mbps</span><span class="metric-label">Emission</span></div>
+                <div class="metric"><span class="metric-value">0.3 MB/s</span><span class="metric-label">Utilisation</span></div>
               </div>
             </div>
             <div class="linechart">
-              <svg viewBox="0 0 300 48" preserveAspectRatio="none">
-                <path d="M0,24 L24,20 L50,29 L75,18 L100,22 L125,15 L150,10 L176,28 L200,24 L226,16 L252,22 L278,17 L300,12" fill="none" stroke="#ffb14d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg viewBox="0 0 300 46" preserveAspectRatio="none">
+                <path d="M0,27 L24,22 L48,29 L72,18 L96,16 L120,22 L144,20 L168,15 L192,12 L216,17 L240,24 L264,18 L288,13 L300,11" fill="none" stroke="#ffb556" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </article>
         </section>
 
-        <section class="content-grid">
+        <section class="bottom">
           <div class="panel">
             <div class="panel-header">
               <div class="search-wrap">
-                <input type="text" id="searchInput" placeholder="Rechercher un processus..." />
+                <input type="text" placeholder="Rechercher un processus..." />
               </div>
-              <div class="toolbar-actions">
+              <div class="toolbar">
                 <div class="toolbar-btn">☰</div>
                 <div class="toolbar-btn">▣</div>
                 <div class="toolbar-btn">▤</div>
@@ -1044,65 +458,65 @@
               <table>
                 <thead>
                   <tr>
-                    <th style="width: 32%;">Nom</th>
-                    <th style="width: 18%;">Statut</th>
-                    <th style="width: 10%;">CPU</th>
-                    <th style="width: 12%;">Mémoire</th>
-                    <th style="width: 10%;">Disque</th>
-                    <th style="width: 10%;">Réseau</th>
-                    <th style="width: 8%;">GPU</th>
+                    <th style="width:32%">Nom</th>
+                    <th style="width:18%">Statut</th>
+                    <th style="width:10%">CPU</th>
+                    <th style="width:12%">Mémoire</th>
+                    <th style="width:10%">Disque</th>
+                    <th style="width:10%">Réseau</th>
+                    <th style="width:8%">GPU</th>
                   </tr>
                 </thead>
-                <tbody id="processRows"></tbody>
+                <tbody>
+                  <tr><td><div class="process-name"><span class="process-icon"></span> Google Chrome (23)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>3.4%</td><td>1 245,6 Mo</td><td>0,1 Mo/s</td><td>0,1 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(105, 166, 255, 0.32), rgba(21, 63, 113, 0.86));"></span> Discord (6)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>2.1%</td><td>612,3 Mo</td><td>0,1 Mo/s</td><td>0,1 Mbps</td><td>1%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(136, 125, 255, 0.26), rgba(26, 62, 117, 0.86));"></span> Steam (7)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>1.8%</td><td>578,4 Mo</td><td>0,1 Mo/s</td><td>0,1 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(85, 210, 137, 0.3), rgba(22, 55, 94, 0.86));"></span> Spotify (4)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>1.2%</td><td>412,7 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(255, 156, 84, 0.32), rgba(38, 76, 123, 0.86));"></span> Explorateur Windows</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>0.8%</td><td>243,1 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(72, 210, 255, 0.28), rgba(18, 52, 82, 0.88));"></span> Antimalware Service Executable</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.6%</td><td>221,8 Mo</td><td>0,1 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(116, 202, 255, 0.24), rgba(16, 51, 90, 0.88));"></span> NVIDIA Container (3)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>0.4%</td><td>186,5 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(153, 171, 255, 0.28), rgba(18, 53, 94, 0.88));"></span> Microsoft Teams (5)</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>0.3%</td><td>142,7 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(116, 223, 255, 0.28), rgba(26, 64, 101, 0.86));"></span> Task Manager</div></td><td><span class="status-pill">En cours d'exécution</span></td><td>0.2%</td><td>98,4 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(108, 232, 255, 0.3), rgba(16, 52, 93, 0.86));"></span> Windows Defender SmartScreen</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.2%</td><td>76,3 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(138, 153, 255, 0.26), rgba(22, 58, 82, 0.86));"></span> Service de l'expérience utilisateur</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.1%</td><td>54,2 Mo</td><td>0 Mo/s</td><td>0,1 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(118, 187, 255, 0.28), rgba(13, 48, 82, 0.86));"></span> Runtime Broker</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.1%</td><td>48,7 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(119, 190, 255, 0.24), rgba(15, 42, 60, 0.88));"></span> Application Frame Host</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.1%</td><td>42,6 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                  <tr><td><div class="process-name"><span class="process-icon" style="background:linear-gradient(135deg, rgba(95, 175, 255, 0.26), rgba(16, 45, 76, 0.86));"></span> Shell Infrastructure Host</div></td><td><span class="status-pill">En arrière-plan</span></td><td>0.0%</td><td>34,8 Mo</td><td>0 Mo/s</td><td>0 Mbps</td><td>0%</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
 
-          <aside class="panel phone-panel">
-            <div class="phone-header">
+          <aside class="panel phone-wrap">
+            <div class="phone-head">
               <span>Téléphone (ADB)</span>
-              <span class="offline-pill"><span class="small-dot"></span> Non connecté</span>
+              <span class="offline"><span class="dot"></span> Non connecté</span>
             </div>
 
             <div class="phone-body">
               <div class="device-empty">
-                <div class="device-phone"></div>
+                <div class="phone-figure"></div>
                 <b>Aucun téléphone connecté</b>
                 <p>Connectez votre appareil via ADB pour afficher les statistiques en temps réel.</p>
               </div>
 
-              <div class="phone-buttons">
+              <div class="phone-actions">
                 <button class="action-btn primary">Connecter le téléphone</button>
                 <button class="action-btn">Voir la diffusion</button>
               </div>
 
-              <div class="mini-analytics">
+              <div class="phone-stats">
                 <h4>Statistiques du téléphone</h4>
                 <div class="mini-stats">
-                  <div class="mini-stat">
-                    <div class="mini-ring" style="--m:#30bfff"><span>0%</span></div>
-                    <div>GPU</div>
-                  </div>
-                  <div class="mini-stat">
-                    <div class="mini-ring" style="--m:#4cffa3"><span>0%</span></div>
-                    <div>CPU</div>
-                  </div>
-                  <div class="mini-stat">
-                    <div class="mini-ring" style="--m:#90ff69"><span>0%</span></div>
-                    <div>RAM</div>
-                  </div>
-                  <div class="mini-stat">
-                    <div class="mini-ring" style="--m:#ffb65d"><span>0%</span></div>
-                    <div>Wi‑Fi</div>
-                  </div>
-                  <div class="mini-stat">
-                    <div class="mini-ring" style="--m:#ff7a80"><span>0%</span></div>
-                    <div>Disque</div>
-                  </div>
+                  <div class="mini-stat"><div class="mini-ring" style="--ring:#2ed6ff"><span>0%</span></div><div>GPU</div></div>
+                  <div class="mini-stat"><div class="mini-ring" style="--ring:#49ffc0"><span>0%</span></div><div>CPU</div></div>
+                  <div class="mini-stat"><div class="mini-ring" style="--ring:#8ffe65"><span>0%</span></div><div>RAM</div></div>
+                  <div class="mini-stat"><div class="mini-ring" style="--ring:#ffbb61"><span>0%</span></div><div>Wi‑Fi</div></div>
+                  <div class="mini-stat"><div class="mini-ring" style="--ring:#ff7d7d"><span>0%</span></div><div>Disque</div></div>
                 </div>
               </div>
 
-              <div class="device-info">
+              <div class="device-meta">
                 <label>Modèle :</label><span>-</span>
                 <label>Android :</label><span>-</span>
                 <label>IP :</label><span>-</span>
@@ -1114,55 +528,5 @@
       </main>
     </div>
   </div>
-
-  <script>
-    const rows = [
-      { name: 'Google Chrome (23)', status: 'En cours d’exécution', cpu: '3.4%', mem: '1 245,6 Mo', disk: '0,1 Mo/s', network: '0,1 Mbps', gpu: '0%' },
-      { name: 'Discord (6)', status: 'En cours d’exécution', cpu: '2.1%', mem: '612,3 Mo', disk: '0,1 Mo/s', network: '0,1 Mbps', gpu: '1%' },
-      { name: 'Steam (7)', status: 'En cours d’exécution', cpu: '1.8%', mem: '578,4 Mo', disk: '0,1 Mo/s', network: '0,1 Mbps', gpu: '0%' },
-      { name: 'Spotify (4)', status: 'En cours d’exécution', cpu: '1.2%', mem: '412,7 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Explorateur Windows', status: 'En cours d’exécution', cpu: '0.8%', mem: '243,1 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Antimalware Service Executable', status: 'En arrière-plan', cpu: '0.6%', mem: '221,8 Mo', disk: '0,1 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'NVIDIA Container (3)', status: 'En cours d’exécution', cpu: '0.4%', mem: '186,5 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Microsoft Teams (5)', status: 'En cours d’exécution', cpu: '0.3%', mem: '142,7 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Task Manager', status: 'En cours d’exécution', cpu: '0.2%', mem: '98,4 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Windows Defender SmartScreen', status: 'En arrière-plan', cpu: '0.2%', mem: '76,3 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Service de l’expérience utilisateur', status: 'En arrière-plan', cpu: '0.1%', mem: '54,2 Mo', disk: '0 Mo/s', network: '0,1 Mbps', gpu: '0%' },
-      { name: 'Runtime Broker', status: 'En arrière-plan', cpu: '0.1%', mem: '48,7 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Application Frame Host', status: 'En arrière-plan', cpu: '0.1%', mem: '42,6 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' },
-      { name: 'Shell Infrastructure Host', status: 'En arrière-plan', cpu: '0.0%', mem: '34,8 Mo', disk: '0 Mo/s', network: '0 Mbps', gpu: '0%' }
-    ];
-
-    const processRows = document.getElementById('processRows');
-    const searchInput = document.getElementById('searchInput');
-
-    function renderRows(filter = '') {
-      const q = filter.trim().toLowerCase();
-      const visible = rows.filter(item => item.name.toLowerCase().includes(q));
-
-      processRows.innerHTML = visible.map((item, index) => {
-        const iconStyle = index % 2 === 0 ? 'rgba(45, 135, 255, 0.3)' : 'rgba(120, 208, 255, 0.4)';
-        return `
-          <tr>
-            <td>
-              <div class="process-name">
-                <span class="process-icon" style="background:linear-gradient(135deg, ${iconStyle}, rgba(17, 46, 80, 0.85));"></span>
-                <span>${item.name}</span>
-              </div>
-            </td>
-            <td><span class="status-pill">${item.status}</span></td>
-            <td>${item.cpu}</td>
-            <td>${item.mem}</td>
-            <td>${item.disk}</td>
-            <td>${item.network}</td>
-            <td>${item.gpu}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    searchInput.addEventListener('input', (e) => renderRows(e.target.value));
-    renderRows();
-  </script>
 </body>
 </html>
