@@ -1,0 +1,205 @@
+/* Sidebar redesign matching the supplied reference image. Add this in <head>: <link rel="stylesheet" href="sidebar.css"> */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  padding: 10px 8px 10px 6px;
+  background:
+    linear-gradient(180deg, rgba(2, 7, 14, .96) 0%, rgba(1, 7, 14, .98) 72%, rgba(10, 7, 19, .98) 100%);
+  border-right: 1px solid rgba(255, 25, 67, .58);
+  box-shadow: inset -10px 0 22px rgba(255, 0, 65, .06), 8px 0 20px rgba(0,0,0,.22);
+  overflow: hidden;
+}
+
+.sidebar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: -1px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, #ff1f4f 0 6%, transparent 7% 28%, #ff1f4f 29% 64%, transparent 65% 88%, #ff1f4f 89%);
+  box-shadow: 0 0 13px #ff1f4f;
+}
+
+.nav {
+  position: relative;
+  z-index: 2;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.nav-item {
+  min-height: 42px;
+  height: 42px;
+  padding: 0 11px;
+  border-radius: 0 7px 7px 0;
+  color: #e4efff;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  gap: 12px;
+  transition: background .18s ease, box-shadow .18s ease, color .18s ease;
+}
+
+.nav-item:nth-child(3) {
+  height: 53px;
+  line-height: 16px;
+}
+
+.nav-item .icon {
+  width: 20px;
+  height: 20px;
+  color: #d9e7ff;
+}
+
+.nav-item .icon svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.7;
+}
+
+.nav-item.active {
+  margin-left: 0;
+  background: linear-gradient(90deg, #ff153f 0%, #e51143 46%, rgba(71, 10, 49, .28) 100%);
+  border: 0;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(255, 25, 69, .26), inset 0 1px rgba(255,255,255,.15);
+}
+
+.nav-item.active::before {
+  display: none;
+}
+
+.nav-item:nth-child(8) {
+  margin-top: 5px;
+  height: 43px;
+  background: linear-gradient(90deg, #a70d3d 0%, #ed164c 68%, #ff1b4c 100%);
+  border: 1px solid rgba(255, 69, 106, .75);
+  box-shadow: 0 0 18px rgba(255, 27, 72, .3), inset 0 1px rgba(255,255,255,.12);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nav-item:nth-child(8) .icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-item:nth-child(9) {
+  margin-top: 3px;
+  height: 38px;
+  border: 1px solid #a41656;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(99, 10, 53, .55), rgba(8, 17, 31, .55));
+  box-shadow: inset 0 0 12px rgba(255, 20, 91, .1);
+}
+
+.nav-item:hover:not(.active):not(:nth-child(8)) {
+  background: rgba(28, 31, 51, .55);
+  color: #fff;
+}
+
+.sidebar-ornament {
+  z-index: 1;
+  height: 205px;
+  margin-top: auto;
+  padding: 0;
+  border-top: 0;
+  border-bottom: 1px solid rgba(255, 28, 67, .75);
+  overflow: visible;
+}
+
+.sidebar-ornament::before {
+  bottom: 5px;
+  width: 175px;
+  height: 145px;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 36, 78, .42), rgba(255, 19, 65, .13) 42%, transparent 72%);
+  filter: blur(15px);
+}
+
+.sidebar-ornament::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  bottom: -1px;
+  height: 25px;
+  background: linear-gradient(130deg, transparent 0 10%, #ff1c4d 11% 14%, transparent 15% 33%, #ff1c4d 34% 38%, transparent 39% 100%);
+  opacity: .8;
+  filter: drop-shadow(0 0 8px #ff174d);
+}
+
+.dragon {
+  width: 185px;
+  height: 150px;
+  margin-bottom: 4px;
+  opacity: 1;
+  filter: drop-shadow(0 0 7px #ff1b4d) drop-shadow(0 0 18px rgba(255, 15, 63, .4));
+}
+
+.dragon::before {
+  clip-path: polygon(7% 78%, 20% 72%, 12% 57%, 30% 62%, 27% 43%, 39% 51%, 43% 28%, 50% 43%, 61% 16%, 62% 40%, 78% 32%, 72% 50%, 94% 48%, 79% 62%, 98% 74%, 75% 72%, 68% 92%, 55% 77%, 43% 96%, 32% 79%, 15% 91%);
+  background: linear-gradient(135deg, rgba(255, 48, 91, .96), rgba(122, 5, 38, .8));
+}
+
+.dragon::after {
+  inset: 25px 27px 18px 26px;
+  clip-path: polygon(6% 75%, 28% 58%, 21% 34%, 43% 48%, 54% 6%, 65% 40%, 91% 25%, 77% 57%, 100% 72%, 69% 72%, 55% 100%, 40% 77%, 19% 94%);
+  background: linear-gradient(135deg, #ff3e70, rgba(102, 4, 34, .8));
+}
+
+.sidebar-footer {
+  z-index: 3;
+  gap: 5px;
+  margin: 0 -2px;
+  padding: 5px 2px 0;
+  border-top: 0;
+  background: rgba(1, 7, 14, .9);
+}
+
+.footer-row.inline {
+  min-height: 38px;
+  height: 38px;
+  margin: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.footer-row.inline .label {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 6px;
+}
+
+.footer-row.inline .label::after {
+  content: "Activé";
+  grid-column: 2;
+  color: #d3e8ff;
+  font-size: 11px;
+  margin-top: -7px;
+}
+
+.footer-row:last-child {
+  min-height: 38px;
+  height: 38px;
+  padding: 0 8px;
+  border-color: #9b1b58;
+  border-radius: 8px;
+  color: #dfeeff;
+  font-size: 12px;
+  background: linear-gradient(90deg, rgba(80, 7, 47, .62), rgba(6, 19, 35, .76));
+}
+
+.footer-row:last-child .label {
+  gap: 7px;
+}
+
+.footer-row .icon-only {
+  font-size: 17px;
+}
+
+@media (max-width: 1200px) {
+  .sidebar { width: 190px; min-width: 190px; }
+}
