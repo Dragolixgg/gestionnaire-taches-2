@@ -1,0 +1,13 @@
+{
+  "name": "gestionnaire-taches-2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gestionnaire des tâches 2.0 pour Windows",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^38.0.0"
+  }
+}
